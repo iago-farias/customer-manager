@@ -7,12 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-enum PhoneType {
-	Residencial,
-	Comercial,
-	Celular
-}
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "phone")
@@ -20,8 +16,10 @@ public class Phone {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@NotBlank(message = "O número de telefone é obriatório")
 	private String number;
 	@Enumerated(EnumType.STRING)
+	@NotNull(message = "O tipo de telefone é obriatório")
 	private PhoneType phoneType;
 	
 	public Long getId() {
@@ -39,9 +37,14 @@ public class Phone {
 	public PhoneType getPhoneType() {
 		return phoneType;
 	}
+	
 	public void setPhoneType(PhoneType phoneType) {
 		this.phoneType = phoneType;
 	}
 	
-	
+	public enum PhoneType {
+		Residencial,
+		Comercial,
+		Celular
+	}
 }

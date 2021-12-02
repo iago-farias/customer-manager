@@ -1,33 +1,39 @@
-package com.customermanager.model;
+package com.customermanager.dto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
+import com.customermanager.model.Address;
 
-@Entity
-@Table(name = "address")
-public class Address {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+public class AddressDTO {
 	private Long id;
-	@NotBlank(message = "O CEP é obrigatório")
 	private String zipCode;
-	@NotBlank(message = "O logradouro é obrigatório")
 	private String publicPlace;
-	@NotBlank(message = "O bairro é obrigatório")
 	private String district;
-	@NotBlank(message = "A cidade é obrigatória")
 	private String city;
-	@NotBlank(message = "A UF é obrigatório")
 	private String state;
 	private String complement;
 	
-	@OneToOne(mappedBy = "address")
-	private Customer customer;
+	public AddressDTO() {
+	}
+	
+	public AddressDTO(Long id, String zipCode, String publicPlace, String district, String city, String state,
+			String complement) {
+		this.id = id;
+		this.zipCode = zipCode;
+		this.publicPlace = publicPlace;
+		this.district = district;
+		this.city = city;
+		this.state = state;
+		this.complement = complement;
+	}
+	
+	public AddressDTO(Address address) {
+		id = address.getId();
+		zipCode = address.getZipCode();
+		publicPlace = address.getPublicPlace();
+		district = address.getDistrict();
+		city = address.getCity();
+		state = address.getState();
+		complement = address.getComplement();
+	}
 	
 	public Long getId() {
 		return id;
