@@ -1,5 +1,6 @@
 
 export interface Customer {
+  id: number;
   name: string;
   cpf: string;
   address: Address;
@@ -22,4 +23,14 @@ export interface Phone {
 
 export interface Email {
   emailAddress: string;
+}
+
+export interface CustomerPage {
+  content: Customer[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
 }

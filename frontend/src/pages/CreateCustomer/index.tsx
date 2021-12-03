@@ -1,11 +1,14 @@
-import {useState} from 'react';
+import React, { useState } from 'react';
 import InputMask from 'react-input-mask';
 import { FaSearch, FaPlus, FaTimes } from 'react-icons/fa';
 
 import Header from "../../components/Header";
 import { Email, Phone } from '../../types/Customer';
+import { getAddressFromCEP } from '../../services/viaCep';
+import { api } from '../../services/api';
+import { ApiError } from '../../types/ApiError';
 
-export default function CreateCustomer(){
+export default function CreateCustomer() {
   const [name, setName] = useState('');
   const [cpf, setCpf] = useState('');
   const [zipCode, setZipCode] = useState('');
@@ -14,18 +17,86 @@ export default function CreateCustomer(){
   const [state, setState] = useState('');
   const [city, setCity] = useState('');
   const [complement, setComplement] = useState('');
-  const [emails, setEmails] = useState<Email[]>([{ emailAddress: ''}]);
+  const [emails, setEmails] = useState<Email[]>([{ emailAddress: '' }]);
   const [emailsCount, setEmailsCount] = useState(0);
   const [phones, setPhones] = useState<Phone[]>([{ number: '', phoneType: 'Residencial' }]);
   const [phonesCount, setPhonesCount] = useState(0);
+  const [isGettingAddress, setIsGettingAddress] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
+  function cleanMask(data: string) {
+    return data.replace(/[-\.() ]/g, '');
+  }
 
-  async function handleSubmit(){
+  async function handleSearchAddress() {
+    setIsGettingAddress(true);
+    const address = await getAddressFromCEP(cleanMask(zipCode));
+    setIsGettingAddress(false);
 
+    setCity(address.localidade);
+    setDistrict(address.bairro);
+    setPublicPlace(address.logradouro);
+    setState(address.uf);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if(isLoading){
+      return;
+    }
+
+    const cleanCpf = cleanMask(cpf);
+    const cleanZipCode = cleanMask(zipCode);
+    const cleanPhones = phones.map(phone => {
+      phone.number = cleanMask(phone.number);
+
+      return phone;
+    });
+
+    try {
+      setIsLoading(true);
+      await api.post('/customers/create', {
+        name,
+        cpf: cleanCpf,
+        address: {
+          zipCode: cleanZipCode,
+          publicPlace,
+          district,
+          city,
+          complement,
+          state
+        },
+        phones: [...cleanPhones],
+        emails: [...emails]
+      });
+      setIsLoading(false);
+      clearInputs();
+      window.scrollTo(0, 0);
+    } catch (err: any) {
+      const apiError = err.response as ApiError;
+      setIsLoading(false);
+      alert(apiError.data.message);
+    }
+  }
+
+  function clearInputs() {
+    setName('');
+    setCpf('')
+    setZipCode('');
+    setPublicPlace('');
+    setDistrict('');
+    setState('');
+    setCity('');
+    setComplement('');
+    setPhones([{ number: '', phoneType: 'Celular' }]);
+    setEmails([{ emailAddress: '' }]);
+    setEmailsCount(0);
+    setPhonesCount(0);
   }
 
   function addEmail() {
-    setEmails(old => [...old, { emailAddress: ''}]);
+    setEmails(old => [...old, { emailAddress: '' }]);
     setEmailsCount(old => old + 1);
   }
 
@@ -38,7 +109,7 @@ export default function CreateCustomer(){
   }
 
   function addPhone() {
-    setPhones(old => [...old, {number: '', phoneType: 'Celular' }]);
+    setPhones(old => [...old, { number: '', phoneType: 'Celular' }]);
     setPhonesCount(old => old + 1);
   }
 
@@ -51,7 +122,7 @@ export default function CreateCustomer(){
     setPhonesCount(old => old - 1);
   }
 
-  return(
+  return (
     <>
       <Header />
 
@@ -134,7 +205,7 @@ export default function CreateCustomer(){
                           className="btn"
                           onClick={() => removePhone()}
                         >
-                          <FaTimes color="#dc3545"/>
+                          <FaTimes color="#dc3545" />
                         </button>
                       )
                     }
@@ -172,7 +243,7 @@ export default function CreateCustomer(){
                           className="btn"
                           onClick={() => removeEmail()}
                         >
-                          <FaTimes  color="#dc3545"/>
+                          <FaTimes color="#dc3545" />
                         </button>
                       )
                     }
@@ -203,12 +274,14 @@ export default function CreateCustomer(){
                     className="form-control"
                     id="floatingPassword"
                     placeholder="CEP"
+                    disabled={isGettingAddress}
                   />
                   <label htmlFor="floatingPassword">CEP</label>
                 </div>
                 <button
                   type="button"
                   className="btn btn-primary ms-3"
+                  onClick={() => handleSearchAddress()}
                 >
                   <FaSearch />
                 </button>
@@ -222,6 +295,7 @@ export default function CreateCustomer(){
                   onChange={(e) => setPublicPlace(e.target.value)}
                   value={publicPlace}
                   placeholder="Logradouro"
+                  disabled={isGettingAddress}
                 />
                 <label htmlFor="floatingPassword">Logradouro</label>
               </div>
@@ -234,6 +308,7 @@ export default function CreateCustomer(){
                   onChange={(e) => setDistrict(e.target.value)}
                   value={district}
                   placeholder="Bairro"
+                  disabled={isGettingAddress}
                 />
                 <label htmlFor="floatingPassword">Bairro</label>
               </div>
@@ -247,6 +322,7 @@ export default function CreateCustomer(){
                     onChange={(e) => setCity(e.target.value)}
                     value={city}
                     placeholder="Cidade"
+                    disabled={isGettingAddress}
                   />
                   <label htmlFor="floatingPassword">Cidade</label>
                 </div>
@@ -259,6 +335,7 @@ export default function CreateCustomer(){
                     onChange={(e) => setState(e.target.value)}
                     value={state}
                     placeholder="UF"
+                    disabled={isGettingAddress}
                   />
                   <label htmlFor="floatingPassword">UF</label>
                 </div>
@@ -273,14 +350,22 @@ export default function CreateCustomer(){
                   onChange={(e) => setComplement(e.target.value)}
                   value={complement}
                   placeholder="Complemento"
+                  disabled={isGettingAddress}
                 />
                 <label htmlFor="floatingPassword">Complemento</label>
               </div>
               <button
                 className="btn btn-primary"
                 type="submit"
+                disabled={isGettingAddress}
               >
-                Salvar
+                {
+                  isLoading ? (
+                    <div className="spinner-border text-light" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  ) : "Salvar"
+                }
               </button>
             </div>
 
