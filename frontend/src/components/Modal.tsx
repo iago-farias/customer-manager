@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom';
+
 import { Customer } from "../types/Customer";
 import { cpfMask, phoneMask } from "../util/masks";
 import PermissionComponent from "./PermissionComponent";
@@ -137,7 +139,7 @@ export default function Modal({ customer }: ModalProps) {
                   <label htmlFor="floatingPassword">Bairro</label>
                 </div>
 
-                <div className="d-flex flex-row justify-content-evenly">
+                <div className="d-flex flex-row justify-content-between">
                   <div className="form-floating">
                     <input
                       type="text"
@@ -178,7 +180,9 @@ export default function Modal({ customer }: ModalProps) {
             <div className="modal-footer mt-3">
               <button type="button" className="btn btn-primary" data-bs-dismiss="modal">Fechar</button>
               <PermissionComponent role="ADMIN">
-                <button type="button" className="btn btn-warning" style={{ color: "white" }} data-bs-dismiss="modal">Editar</button>
+                <Link to={`/customer/update/${customer.id}`}> 
+                  <button type="button" className="btn btn-warning" style={{ color: "white" }} data-bs-dismiss="modal">Editar</button>
+                </Link>
               </PermissionComponent>
             </div>
           </div>

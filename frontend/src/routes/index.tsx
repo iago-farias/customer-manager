@@ -27,7 +27,7 @@ export default function Routes() {
 
       <PrivateRoute path="/dashboard" component={Dashboard} role="USER" />
       <PrivateRoute path="/customer/create" component={CreateCustomer} role="ADMIN" />
-      <PrivateRoute path="/customer/update" component={UpdateCustomer} role="ADMIN"/>
+      <PrivateRoute path="/customer/update/:customerId" component={UpdateCustomer} role="ADMIN"/>
     </Switch>
   );
 }

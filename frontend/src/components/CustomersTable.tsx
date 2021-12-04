@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-
 import { FaPen, FaTrash, FaEye } from 'react-icons/fa';
+import {useHistory} from 'react-router-dom';
+
 import { api } from '../services/api';
 import { Customer, CustomerPage } from '../types/Customer';
 import { cpfMask, phoneMask } from '../util/masks';
@@ -14,6 +15,8 @@ export default function CustomersTable() {
   const [first, setFirst] = useState(true);
   const [last, setLast] = useState(true);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>();
+
+  const history = useHistory();
 
   useEffect(() => {
     (async () => {
@@ -50,7 +53,6 @@ export default function CustomersTable() {
 
     }
   }
-
 
   function handleShowModal(customer : Customer) {
     setSelectedCustomer(customer);
@@ -99,6 +101,7 @@ export default function CustomersTable() {
                       data-bs-toggle="tooltip"
                       data-bs-placement="top"
                       title="Editar"
+                      onClick={() => history.push(`/customer/update/${customer.id}`)}
                     >
                       <FaPen color="#fff" />
                     </button>

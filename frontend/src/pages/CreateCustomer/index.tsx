@@ -23,7 +23,6 @@ export default function CreateCustomer() {
   const [phonesCount, setPhonesCount] = useState(0);
   const [isGettingAddress, setIsGettingAddress] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   
   useEffect(() => {
     document.title = "Customer Manager | Cadastro de Cliente"
@@ -373,7 +372,6 @@ export default function CreateCustomer() {
                 }
               </button>
             </div>
-
           </form>
         </div>
       </div>
