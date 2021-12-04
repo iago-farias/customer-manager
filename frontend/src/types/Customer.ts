@@ -13,6 +13,7 @@ interface Address {
   publicPlace: string;
   city: string;
   state: string;
+  district: string;
   complement: string;
 }
 

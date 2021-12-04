@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import InputMask from 'react-input-mask';
 import { FaSearch, FaPlus, FaTimes } from 'react-icons/fa';
 
@@ -23,6 +23,11 @@ export default function CreateCustomer() {
   const [phonesCount, setPhonesCount] = useState(0);
   const [isGettingAddress, setIsGettingAddress] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  
+  useEffect(() => {
+    document.title = "Customer Manager | Cadastro de Cliente"
+  }, []);
 
   function cleanMask(data: string) {
     return data.replace(/[-\.() ]/g, '');

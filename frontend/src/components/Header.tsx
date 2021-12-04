@@ -1,6 +1,15 @@
-import {Link} from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthProvider';
 
-export default function Header(){
+export default function Header() {
+  const { logOut } = useAuth();
+  const history = useHistory();
+
+  function handleLogout() {
+    logOut();
+    history.push('/');
+  }
+
   return (
     <header className="p-3 bg-dark text-white">
       <div className="container">
@@ -14,9 +23,10 @@ export default function Header(){
           </ul>
 
           <div className="text-end">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn btn-warning"
+              onClick={() => handleLogout()}
             >
               Logout
             </button>

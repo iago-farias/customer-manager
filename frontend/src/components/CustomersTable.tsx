@@ -1,30 +1,31 @@
 import { useState, useEffect } from 'react';
 
-import { FaPen, FaTrash } from 'react-icons/fa';
+import { FaPen, FaTrash, FaEye } from 'react-icons/fa';
 import { api } from '../services/api';
 import { Customer, CustomerPage } from '../types/Customer';
 import { cpfMask, phoneMask } from '../util/masks';
+import Modal from './Modal';
 import Pagination from './Pagination';
+import PermissionComponent from './PermissionComponent';
 
 export default function CustomersTable() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [activePage, setActivePage] = useState(0);
   const [first, setFirst] = useState(true);
   const [last, setLast] = useState(true);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer>();
 
   useEffect(() => {
-    getCustomers();
+    (async () => {
+      const response = await api.get(`/customers?page=${activePage}&size=20`);
+
+      const page = response.data as CustomerPage;
+
+      setCustomers(page.content);
+      setFirst(page.first);
+      setLast(page.last);
+    })();
   }, [activePage]);
-
-  async function getCustomers() {
-    const response = await api.get(`/customers?page=${activePage}&size=20`);
-
-    const page = response.data as CustomerPage;
-
-    setCustomers(page.content);
-    setFirst(page.first);
-    setLast(page.last);
-  }
 
   function handleNextPage() {
     setActivePage(old => old - 1);
@@ -34,8 +35,34 @@ export default function CustomersTable() {
     setActivePage(old => old + 1);
   }
 
+  async function removeCustomer(customerId: number) {
+    try {
+      await api.delete(`/customers/${customerId}`);
+
+      setCustomers(old => old.filter(customer => {
+        if (customer.id !== customerId) {
+          return customer;
+        }
+      }))
+
+    } catch (err) {
+      console.log(err);
+
+    }
+  }
+
+
+  function handleShowModal(customer : Customer) {
+    setSelectedCustomer(customer);
+  }
+
   return (
     <>
+    {
+      selectedCustomer && (
+        <Modal customer={selectedCustomer} />
+      )
+    }
       <table className="table table-striped">
         <thead>
           <tr>
@@ -55,21 +82,37 @@ export default function CustomersTable() {
                 <td>{phoneMask(customer.phones[0])}</td>
                 <td>{customer.emails[0].emailAddress}</td>
                 <td>
-                  <button
-                    className="btn btn-warning btn-sm me-3 editButton"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title="Editar"
+
+                  <button 
+                    type="button" 
+                    className="btn btn-primary btn-sm me-3"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#exampleModal"
+                    onClick={() => handleShowModal(customer)}
                   >
-                    <FaPen color="#fff" />
+                    <FaEye />
                   </button>
 
+                  <PermissionComponent role="ADMIN">
+                    <button
+                      className="btn btn-warning btn-sm me-3 editButton"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="Editar"
+                    >
+                      <FaPen color="#fff" />
+                    </button>
+                  </PermissionComponent>
 
-                  <button
-                    className="btn btn-danger btn-sm"
-                  >
-                    <FaTrash />
-                  </button>
+                  <PermissionComponent role="ADMIN">
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => removeCustomer(customer.id)}
+                    >
+                      <FaTrash />
+                    </button>
+                  </PermissionComponent>
+
                 </td>
               </tr>
             ))

@@ -1,11 +1,19 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
+import {useHistory} from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthProvider';
 
 export default function Login(){
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
 
-  async function handleSubmit() {
+  const history = useHistory();
+  const {signIn} = useAuth();
 
+  async function handleSubmit(e : React.FormEvent) {
+    e.preventDefault();
+
+    await signIn({userName, userPassword: password});
+    history.push('/dashboard');
   }
 
   return(
