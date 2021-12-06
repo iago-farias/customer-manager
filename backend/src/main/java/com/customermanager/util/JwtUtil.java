@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +15,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtUtil {
-	
-	private static final String SECRET_KEY = "KJDSAFNHIJADSFIANHSDFNLOISDA";
+	@Value("${jwt.secret}")
+	private String SECRET_KEY;
 	
 	private static final int TOKEN_VALIDITY = 3600 * 5;
 	
