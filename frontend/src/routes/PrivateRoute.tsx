@@ -10,18 +10,22 @@ interface RoutePropsData extends RouteProps {
 export default function PrivateRoute({ role, ...rest }: RoutePropsData) {
   const [hasPermission, setHasPermission] = useState(false);
   const [isLoading, setIsloading] = useState(true);
-  const { token } = useAuth();
+  const { token, logOut } = useAuth();
 
   useEffect(() => {
     (async () => {
-      setIsloading(true);
-      const response = await api.get("/user/roles");
-      const userRoles = response.data as string[];
-
-      const permission = userRoles.includes(role as string);
-      
-      setHasPermission(permission);
-      setIsloading(false);
+      try {
+        setIsloading(true);
+        const response = await api.get("/user/roles");
+        const userRoles = response.data as string[];
+  
+        const permission = userRoles.includes(role as string);
+        
+        setHasPermission(permission);
+        setIsloading(false);
+      } catch(err){
+        logOut();
+      }
     })();
   }, []);
 

@@ -16,10 +16,10 @@ public class Phone {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@NotBlank(message = "O número de telefone é obriatório")
+	@NotBlank(message = "O número de telefone é obrigatório")
 	private String number;
 	@Enumerated(EnumType.STRING)
-	@NotNull(message = "O tipo de telefone é obriatório")
+	@NotNull(message = "O tipo de telefone é obrigatório")
 	private PhoneType phoneType;
 	
 	public Long getId() {

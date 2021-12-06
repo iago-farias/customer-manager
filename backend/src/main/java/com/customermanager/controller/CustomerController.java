@@ -1,5 +1,7 @@
 package com.customermanager.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +44,7 @@ public class CustomerController {
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping(value = "/create")
-	public ResponseEntity<String> addCustomer(@RequestBody Customer customer){
+	public ResponseEntity<String> addCustomer(@Valid @RequestBody Customer customer){
 		customerService.addCustomer(customer);
 		
 		return ResponseEntity.ok("Cliente criado com sucesso");
@@ -50,7 +52,7 @@ public class CustomerController {
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<String> updateCustomer(@PathVariable(name = "id") Long id, @RequestBody Customer customer){
+	public ResponseEntity<String> updateCustomer(@PathVariable(name = "id") Long id, @Valid @RequestBody Customer customer){
 		customerService.updateCustomer(id, customer);
 		
 		return ResponseEntity.ok("Cliente atualizado com sucesso");

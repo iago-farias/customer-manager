@@ -32,12 +32,12 @@ public class Customer {
 	@OneToOne(cascade = CascadeType.ALL)
 	@Valid
 	private Address address;
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "customer_id", referencedColumnName = "id")
 	@NotEmpty(message = "É necessário cadastrar pelo menos 1 telefone para contato")
 	@Valid
 	private List<Phone> phones;
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "customer_id", referencedColumnName = "id")
 	@NotEmpty(message = "É necessário cadastrar pelo menos 1 email para contato")
 	@Valid

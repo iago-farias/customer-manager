@@ -22,3 +22,11 @@ export function phoneMask(phone : Phone){
     return `(${phone.number.slice(0,2)}) ${phone.number.slice(2,7)}-${phone.number.slice(7, 11)}`
   }
 }
+
+export function cepMask(cep : string) {
+  if(cep.length < 8){
+    return;
+  }
+
+  return `${cep.slice(0, 2)}.${cep.slice(2, 5)}-${cep.slice(5,8)}`
+}

@@ -23,7 +23,8 @@ export default function CreateCustomer() {
   const [phonesCount, setPhonesCount] = useState(0);
   const [isGettingAddress, setIsGettingAddress] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [errors, setErrors] = useState<ApiError>({ hasSubmited: false });
+
   useEffect(() => {
     document.title = "Customer Manager | Cadastro de Cliente"
   }, []);
@@ -34,19 +35,29 @@ export default function CreateCustomer() {
 
   async function handleSearchAddress() {
     setIsGettingAddress(true);
-    const address = await getAddressFromCEP(cleanMask(zipCode));
-    setIsGettingAddress(false);
+    try {
+      const address = await getAddressFromCEP(cleanMask(zipCode));
+      setIsGettingAddress(false);
 
-    setCity(address.localidade);
-    setDistrict(address.bairro);
-    setPublicPlace(address.logradouro);
-    setState(address.uf);
+      if(!address){
+        alert("Não foi possível encontrar o CEP");
+        return;
+      }
+  
+      setCity(address.localidade);
+      setDistrict(address.bairro);
+      setPublicPlace(address.logradouro);
+      setState(address.uf);
+    } catch(err){
+      alert("Não foi possível encontrar o CEP");
+      setIsGettingAddress(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if(isLoading){
+    if (isLoading) {
       return;
     }
 
@@ -60,7 +71,7 @@ export default function CreateCustomer() {
 
     try {
       setIsLoading(true);
-      await api.post('/customers/create', {
+      const response = await api.post('/customers/create', {
         name,
         cpf: cleanCpf,
         address: {
@@ -77,10 +88,20 @@ export default function CreateCustomer() {
       setIsLoading(false);
       clearInputs();
       window.scrollTo(0, 0);
+      alert(response.data);
     } catch (err: any) {
-      const apiError = err.response as ApiError;
+      const apiError = err.response.data;
       setIsLoading(false);
-      alert(apiError.data.message);
+      setErrors({
+        hasSubmited: true, address: {
+          zipCode: apiError["address.zipCode"],
+          city: apiError["address.city"],
+          district: apiError["address.district"],
+          publicPlace: apiError["address.publicPlace"],
+          state: apiError["address.state"]
+        }, ...apiError
+      });
+      console.log(apiError);
     }
   }
 
@@ -129,10 +150,8 @@ export default function CreateCustomer() {
   return (
     <>
       <Header />
-
       <div className="container py-3">
         <h1 className="text-center py-3">Cadastro de cliente</h1>
-
         <div className="d-flex justify-content-center mt-3">
 
           <form onSubmit={handleSubmit} style={{ maxWidth: 500 }}>
@@ -140,13 +159,16 @@ export default function CreateCustomer() {
               <div className="form-floating">
                 <input
                   type="text"
-                  className="form-control"
-                  id="floatingInputName"
+                  className={`form-control ${errors.name !== undefined ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
+                  id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Nome completo"
                 />
-                <label htmlFor="floatingInputName">Nome completo</label>
+                <label htmlFor="name">Nome completo</label>
+                <div className="invalid-feedback">
+                  {errors?.name}
+                </div>
               </div>
               <div className="form-floating">
 
@@ -155,11 +177,14 @@ export default function CreateCustomer() {
                   value={cpf}
                   onChange={(e) => setCpf(e.target.value)}
                   type="text"
-                  className="form-control"
-                  id="floatingPassword"
+                  className={`form-control ${errors.cpf !== undefined ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
+                  id="cpf"
                   placeholder="CPF"
                 />
-                <label htmlFor="floatingPassword">CPF</label>
+                <label htmlFor="cpf">CPF</label>
+                <div className="invalid-feedback">
+                  {errors?.cpf}
+                </div>
               </div>
             </div>
 
@@ -176,8 +201,7 @@ export default function CreateCustomer() {
                       <InputMask
                         mask={phone.phoneType === "Celular" ? "(99) 99999-9999" : "(99) 9999-9999"}
                         type="tel"
-                        className="form-control"
-                        id="floatingPassword"
+                        className={`form-control ${phone.number === "" && errors.hasSubmited ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
                         placeholder="Telefone"
                         value={phone.number}
                         onChange={(e) => setPhones(old => {
@@ -185,11 +209,15 @@ export default function CreateCustomer() {
                           return [...old];
                         })}
                       />
-                      <label htmlFor="floatingPassword">Telefone {index + 1} </label>
+                      <label>Telefone {index + 1} </label>
+                      <div className="invalid-feedback">
+                        O número de telefone é obrigatório
+                      </div>
                     </div>
 
                     <select
-                      className="form-select w-50"
+                      className="form-select w-50 ms-3"
+                      style={{maxHeight: 58}}
                       aria-label="Tipo Telefone"
                       value={phone.phoneType}
                       onChange={(e) => setPhones(old => {
@@ -206,6 +234,7 @@ export default function CreateCustomer() {
                       index > 0 && (
                         <button
                           type="button"
+                          style={{maxHeight: 58}}
                           className="btn"
                           onClick={() => removePhone()}
                         >
@@ -229,8 +258,7 @@ export default function CreateCustomer() {
                     <div className="form-floating w-100">
                       <input
                         type="email"
-                        className="form-control"
-                        id="floatingPassword"
+                        className={`form-control ${email.emailAddress === "" && errors.hasSubmited ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
                         placeholder="Email"
                         value={email.emailAddress}
                         onChange={(e) => setEmails(old => {
@@ -238,7 +266,10 @@ export default function CreateCustomer() {
                           return [...old];
                         })}
                       />
-                      <label htmlFor="floatingPassword">Email {index + 1}</label>
+                      <label>Email {index + 1}</label>
+                      <div className="invalid-feedback">
+                        O email é obrigatório
+                      </div>
                     </div>
                     {
                       index > 0 && (
@@ -275,16 +306,19 @@ export default function CreateCustomer() {
                     value={zipCode}
                     onChange={(e) => setZipCode(e.target.value)}
                     type="text"
-                    className="form-control"
-                    id="floatingPassword"
+                    className={`form-control ${errors.address?.zipCode !== undefined ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
                     placeholder="CEP"
                     disabled={isGettingAddress}
                   />
-                  <label htmlFor="floatingPassword">CEP</label>
+                  <label>CEP</label>
+                  <div className="invalid-feedback">
+                    {errors.address?.zipCode}
+                  </div>
                 </div>
                 <button
                   type="button"
                   className="btn btn-primary ms-3"
+                  style={{maxHeight: 58}}
                   onClick={() => handleSearchAddress()}
                 >
                   <FaSearch />
@@ -294,54 +328,64 @@ export default function CreateCustomer() {
               <div className="form-floating">
                 <input
                   type="text"
-                  className="form-control"
-                  id="floatingPassword"
+                  className={`form-control ${errors.address?.publicPlace !== undefined ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
                   onChange={(e) => setPublicPlace(e.target.value)}
                   value={publicPlace}
                   placeholder="Logradouro"
                   disabled={isGettingAddress}
                 />
-                <label htmlFor="floatingPassword">Logradouro</label>
+                <label>Logradouro</label>
+                <div className="invalid-feedback">
+                  {errors.address?.publicPlace}
+                </div>
               </div>
 
               <div className="form-floating">
                 <input
                   type="text"
-                  className="form-control"
-                  id="floatingPassword"
+                  className={`form-control ${errors.address?.district !== undefined ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
                   onChange={(e) => setDistrict(e.target.value)}
                   value={district}
                   placeholder="Bairro"
                   disabled={isGettingAddress}
                 />
-                <label htmlFor="floatingPassword">Bairro</label>
+                <label>Bairro</label>
+                <div className="invalid-feedback">
+                  {errors.address?.district}
+                </div>
               </div>
 
               <div className="d-flex flex-row justify-content-evenly">
                 <div className="form-floating">
                   <input
                     type="text"
-                    className="form-control"
-                    id="floatingPassword"
+                    className={`form-control ${errors.address?.city !== undefined ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
+
                     onChange={(e) => setCity(e.target.value)}
                     value={city}
                     placeholder="Cidade"
                     disabled={isGettingAddress}
                   />
-                  <label htmlFor="floatingPassword">Cidade</label>
+                  <label>Cidade</label>
+                  <div className="invalid-feedback">
+                    {errors.address?.city}
+                  </div>
                 </div>
 
                 <div className="form-floating ms-3">
                   <input
                     type="text"
-                    className="form-control"
-                    id="floatingPassword"
+                    className={`form-control ${errors.address?.state !== undefined ? "is-invalid" : errors.hasSubmited ? "is-valid" : ""}`}
+
                     onChange={(e) => setState(e.target.value)}
                     value={state}
                     placeholder="UF"
                     disabled={isGettingAddress}
                   />
-                  <label htmlFor="floatingPassword">UF</label>
+                  <label>UF</label>
+                  <div className="invalid-feedback">
+                    {errors.address?.state}
+                  </div>
                 </div>
               </div>
 
@@ -350,13 +394,12 @@ export default function CreateCustomer() {
                 <input
                   type="text"
                   className="form-control"
-                  id="floatingPassword"
                   onChange={(e) => setComplement(e.target.value)}
                   value={complement}
                   placeholder="Complemento"
                   disabled={isGettingAddress}
                 />
-                <label htmlFor="floatingPassword">Complemento</label>
+                <label>Complemento</label>
               </div>
               <button
                 className="btn btn-primary"

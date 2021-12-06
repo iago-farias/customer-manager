@@ -13,7 +13,7 @@ public class Email {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@NotBlank(message = "O email é obriatório")
+	@NotBlank(message = "O email é obrigatório")
 	private String emailAddress;
 	
 	public Long getId() {

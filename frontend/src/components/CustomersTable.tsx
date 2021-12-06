@@ -60,11 +60,7 @@ export default function CustomersTable() {
 
   return (
     <>
-    {
-      selectedCustomer && (
-        <Modal customer={selectedCustomer} />
-      )
-    }
+      <Modal customer={selectedCustomer} />
       <table className="table table-striped">
         <thead>
           <tr>
@@ -91,6 +87,7 @@ export default function CustomersTable() {
                     data-bs-toggle="modal" 
                     data-bs-target="#exampleModal"
                     onClick={() => handleShowModal(customer)}
+                    title="Visualizar"
                   >
                     <FaEye />
                   </button>
@@ -108,9 +105,11 @@ export default function CustomersTable() {
                   </PermissionComponent>
 
                   <PermissionComponent role="ADMIN">
+                    
                     <button
                       className="btn btn-danger btn-sm"
                       onClick={() => removeCustomer(customer.id)}
+                      title="Remover"
                     >
                       <FaTrash />
                     </button>

@@ -1,11 +1,11 @@
 import {Link} from 'react-router-dom';
 
 import { Customer } from "../types/Customer";
-import { cpfMask, phoneMask } from "../util/masks";
+import { cepMask, cpfMask, phoneMask } from "../util/masks";
 import PermissionComponent from "./PermissionComponent";
 
 interface ModalProps {
-  customer: Customer;
+  customer?: Customer;
 }
 
 export default function Modal({ customer }: ModalProps) {
@@ -19,6 +19,9 @@ export default function Modal({ customer }: ModalProps) {
             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div className="modal-body">
+            {
+              customer && (
+            <>
             <div className="vstack gap-3">
               <div className="form-floating">
                 <input
@@ -49,7 +52,7 @@ export default function Modal({ customer }: ModalProps) {
             <div className="vstack gap-3">
               {
                 customer.phones.map((phone, index) => (
-                  <div className="d-flex flex-row" key={index}>
+                  <div className="d-flex flex-row justify-content-between" key={index}>
                     <div
                       className="form-floating"
                       key={index}
@@ -104,7 +107,7 @@ export default function Modal({ customer }: ModalProps) {
                 <div className="d-flex flex-row">
                   <div className="form-floating">
                     <input
-                      value={customer.address.zipCode}
+                      value={cepMask(customer.address.zipCode)}
                       type="text"
                       className="form-control"
                       id="floatingPassword"
@@ -185,6 +188,9 @@ export default function Modal({ customer }: ModalProps) {
                 </Link>
               </PermissionComponent>
             </div>
+          </>
+              )
+            }
           </div>
         </div>
       </div>
