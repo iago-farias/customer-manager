@@ -20,7 +20,7 @@ public class UserController {
 	
 	@PostConstruct
 	public void createUsers() {
-		userService.initUsers();
+		//userService.initUsers();
 	}
 	
 	@GetMapping("/roles")

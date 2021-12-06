@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			httpSecurity.headers().frameOptions().disable();
 		}
 
-		httpSecurity.cors();
+		httpSecurity.cors().disable();
 		httpSecurity.csrf().disable().authorizeRequests().antMatchers("/auth/login", "/h2-console/**").permitAll()
 		.anyRequest().authenticated()
 		.and()
