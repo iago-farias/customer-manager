@@ -5,15 +5,27 @@ import { useAuth } from '../../contexts/AuthProvider';
 export default function Login(){
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const history = useHistory();
   const {signIn} = useAuth();
 
   async function handleSubmit(e : React.FormEvent) {
     e.preventDefault();
-
-    await signIn({userName, userPassword: password});
-    history.push('/dashboard');
+    try {
+      setIsLoading(true);
+      await signIn({userName, userPassword: password});
+      setIsLoading(false);
+      history.push('/dashboard');
+    } catch(err : any){
+      setIsLoading(false);
+      if(err.response.status === 500){
+        alert("Usuário ou senha incorretos");
+        return;
+      }
+      
+      alert("Não foi possível realizar o login");
+    }
   }
 
   return(
@@ -44,7 +56,15 @@ export default function Login(){
           />
           <label htmlFor="floatingPassword">Senha</label>
         </div>
-        <button className="w-100 btn btn-lg btn-primary mt-3" type="submit">Login</button>
+        <button className="w-100 btn btn-lg btn-primary mt-3" type="submit">
+          {
+             isLoading ? (
+              <div className="spinner-border text-light" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            ) : "Login"
+          }
+          </button>
       </form>
     </main>
   </div>
