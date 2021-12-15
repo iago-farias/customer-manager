@@ -46,18 +46,18 @@ public class CustomerController {
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping(value = "/create")
-	public ResponseEntity<String> addCustomer(@Valid @RequestBody Customer customer){
-		customerService.addCustomer(customer);
+	public ResponseEntity<CustomerDTO> addCustomer(@Valid @RequestBody Customer customer){
+		CustomerDTO newCustomer = customerService.addCustomer(customer);
 		
-		return ResponseEntity.ok("Cliente criado com sucesso");
+		return ResponseEntity.ok(newCustomer);
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<String> updateCustomer(@PathVariable(name = "id") Long id, @Valid @RequestBody Customer customer){
-		customerService.updateCustomer(id, customer);
+	public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable(name = "id") Long id, @Valid @RequestBody Customer customer){
+		CustomerDTO updatedCustomer = customerService.updateCustomer(id, customer);
 		
-		return ResponseEntity.ok("Cliente atualizado com sucesso");
+		return ResponseEntity.ok(updatedCustomer);
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")

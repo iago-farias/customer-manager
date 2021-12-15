@@ -36,11 +36,15 @@ public class CustomerService {
 		return new CustomerDTO(result.get());
 	}
 	
-	public void addCustomer(Customer customer) {
-		customerRepository.save(customer);
+	@Transactional
+	public CustomerDTO addCustomer(Customer customer) {
+		Customer newCustomer = customerRepository.save(customer);
+		
+		return new CustomerDTO(newCustomer);
 	}
 	
-	public void updateCustomer(Long id, Customer customer) {
+	@Transactional
+	public CustomerDTO updateCustomer(Long id, Customer customer) {
 		boolean exists = customerRepository.existsById(id);
 		
 		if(!exists) {
@@ -49,15 +53,19 @@ public class CustomerService {
 		
 		customer.setId(id);
 		
-		customerRepository.save(customer);
+		Customer updatedCustomer = customerRepository.save(customer);
+		
+		return new CustomerDTO(updatedCustomer);
 	}
 	
+	@Transactional
 	public void deleteCustomer(Long id) {
 		boolean exists = customerRepository.existsById(id);
 		
 		if(!exists) {
 			throw new BusinessException("Cliente com id "+ id + " não encontrado");
 		}
+		
 		customerRepository.deleteById(id);
 	}
 }
