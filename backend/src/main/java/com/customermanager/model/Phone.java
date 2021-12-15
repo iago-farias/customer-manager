@@ -10,8 +10,13 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name = "phone")
+@Getter
+@Setter
 public class Phone {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,26 +26,6 @@ public class Phone {
 	@Enumerated(EnumType.STRING)
 	@NotNull(message = "O tipo de telefone é obrigatório")
 	private PhoneType phoneType;
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getNumber() {
-		return number;
-	}
-	public void setNumber(String number) {
-		this.number = number;
-	}
-	public PhoneType getPhoneType() {
-		return phoneType;
-	}
-	
-	public void setPhoneType(PhoneType phoneType) {
-		this.phoneType = phoneType;
-	}
 	
 	public enum PhoneType {
 		Residencial,

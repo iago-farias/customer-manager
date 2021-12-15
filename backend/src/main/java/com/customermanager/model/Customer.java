@@ -15,10 +15,16 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "customer")
+@Getter
+@Setter
 public class Customer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,41 +48,4 @@ public class Customer {
 	@NotEmpty(message = "É necessário cadastrar pelo menos 1 email para contato")
 	@Valid
 	private List<Email> emails;
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getCpf() {
-		return cpf;
-	}
-	public void setCpf(String cpf) {
-		this.cpf = cpf;
-	}
-	public Address getAddress() {
-		return address;
-	}
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-	public List<Phone> getPhones() {
-		return phones;
-	}
-	public void setPhones(List<Phone> phones) {
-		this.phones = phones;
-	}
-	public List<Email> getEmails() {
-		return emails;
-	}
-	public void setEmails(List<Email> emails) {
-		this.emails = emails;
-	}	
 }
