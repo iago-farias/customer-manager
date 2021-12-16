@@ -71,7 +71,7 @@ export default function CreateCustomer() {
 
     try {
       setIsLoading(true);
-      const response = await api.post('/customers/create', {
+      await api.post('/customers/create', {
         name,
         cpf: cleanCpf,
         address: {
@@ -88,7 +88,7 @@ export default function CreateCustomer() {
       setIsLoading(false);
       clearInputs();
       window.scrollTo(0, 0);
-      alert(response.data);
+      alert("Cliente criado com sucesso");
     } catch (err: any) {
       const apiError = err.response.data;
       setIsLoading(false);

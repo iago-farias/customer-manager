@@ -100,7 +100,7 @@ export default function UpdateCustomer() {
 
     try {
       setIsLoading(true);
-      const response = await api.put(`/customers/${customerId}`, {
+      await api.put(`/customers/${customerId}`, {
         name,
         cpf: cleanCpf,
         address: {
@@ -116,7 +116,7 @@ export default function UpdateCustomer() {
       });
       setIsLoading(false);
       window.scrollTo(0, 0);
-      alert(response.data);
+      alert("Cliente atualizado com sucesso");
       history.goBack();
     } catch (err: any) {
       const apiError = err.response.data;
