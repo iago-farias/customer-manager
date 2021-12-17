@@ -118,6 +118,7 @@ export default function CreateCustomer() {
     setEmails([{ emailAddress: '' }]);
     setEmailsCount(0);
     setPhonesCount(0);
+    setErrors({hasSubmited: false});
   }
 
   function addEmail() {

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.customermanager.dto.CustomerDTO;
 import com.customermanager.exception.BusinessException;
+import com.customermanager.mapper.CustomerMapper;
 import com.customermanager.model.Customer;
 import com.customermanager.repositories.CustomerRepository;
 
@@ -22,7 +23,7 @@ public class CustomerService {
 	public Page<CustomerDTO> listAll(Pageable pageable) {
 		Page<Customer> result = customerRepository.findAll(pageable);
 		
-		return result.map(customer -> new CustomerDTO(customer));
+		return result.map(customer -> CustomerMapper.INSTANCE.customerToCustomerDTO(customer));
 	}
 	
 	@Transactional(readOnly = true)
@@ -32,15 +33,14 @@ public class CustomerService {
 		if(result.isEmpty()) {
 			throw new BusinessException("Cliente com id "+ id + " não encontrado");
 		}
-		
-		return new CustomerDTO(result.get());
+		return CustomerMapper.INSTANCE.customerToCustomerDTO(result.get());
 	}
 	
 	@Transactional
 	public CustomerDTO addCustomer(Customer customer) {
 		Customer newCustomer = customerRepository.save(customer);
 		
-		return new CustomerDTO(newCustomer);
+		return CustomerMapper.INSTANCE.customerToCustomerDTO(newCustomer);
 	}
 	
 	@Transactional
@@ -55,7 +55,7 @@ public class CustomerService {
 		
 		Customer updatedCustomer = customerRepository.save(customer);
 		
-		return new CustomerDTO(updatedCustomer);
+		return CustomerMapper.INSTANCE.customerToCustomerDTO(updatedCustomer);
 	}
 	
 	@Transactional
