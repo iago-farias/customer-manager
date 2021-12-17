@@ -15,5 +15,6 @@ Uma versão de teste pode ser acessada pelo link: https://heuristic-torvalds-0c9
 - JWT
 - PostgresSQL
 - Lombok
+- MapStruct 
 - React
 - Bootstrap
